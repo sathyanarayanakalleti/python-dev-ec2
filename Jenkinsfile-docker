@@ -1,0 +1,51 @@
+pipeline {
+    agent { label 'linux-docker-build-node' }
+
+    environment {
+        // Define the Python version
+        PYTHON_VERSION = '3'
+        DOCKER_IMAGE_NAME = 'flaskimage'
+        REMOTE_SERVER = '192.168.117.109'
+        REMOTE_USER = 'python-dev'
+    }
+   
+    stages {
+        stage('Clean Project') {
+          steps {
+            script {
+              def remote = [:]
+                remote.name = "python-dev"
+                remote.host = "192.168.117.109"
+                remote.allowAnyHosts = true
+               withCredentials([usernamePassword(credentialsId: 'refl-internal-linux-creds', passwordVariable: 'password', usernameVariable: 'userName')]) {
+                remote.user = userName
+                remote.password = password
+                     
+            
+          }
+        }
+      }
+    }
+
+        stage('Build') {
+            steps {
+                script {
+                    // Build Docker image
+                    sh "docker build -t ${DOCKER_IMAGE_NAME} ."
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    // Transfer Docker image to the remote server
+                    sh "docker save ${DOCKER_IMAGE_NAME} | gzip | ssh ${REMOTE_USER}@${REMOTE_SERVER} 'docker load'"
+                    
+                    // Run Docker container on the remote server
+                    sh "ssh ${REMOTE_USER}@${REMOTE_SERVER} 'docker run -d -p 5000:5000 ${DOCKER_IMAGE_NAME}'"
+                }
+            }
+        }
+    }
+}
