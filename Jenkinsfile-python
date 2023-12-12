@@ -14,7 +14,7 @@ pipeline {
                 remote.name = "python-dev"
                 remote.host = "18.234.194.30"
                 remote.allowAnyHosts = true
-               withCredentials([usernamePassword(credentialsId: 'jai-credentials', passwordVariable: 'password', usernameVariable: 'userName')]) {
+               withCredentials([usernamePassword(credentialsId: 'jai-python-dev', passwordVariable: 'password', usernameVariable: 'userName')]) {
                 remote.user = userName
                 remote.password = password
                      
@@ -43,7 +43,7 @@ pipeline {
           remote.name = "python-dev"
           remote.host = "18.234.194.30"
           remote.allowAnyHosts = true
-          withCredentials([usernamePassword(credentialsId: 'jai-credentials', passwordVariable: 'password', usernameVariable: 'userName')]) {
+          withCredentials([usernamePassword(credentialsId: 'jai-python-dev', passwordVariable: 'password', usernameVariable: 'userName')]) {
             remote.user = userName
             remote.password = password
             sshCommand remote: remote, command:'cd /tmp/;tar -xf python-dev.tar.gz'
